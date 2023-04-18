@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comment and Search</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Post a Comment</h1>
+    <form id="comment-form">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <br>
+        <label for="content">Content:</label>
+        <textarea id="content" name="content" required></textarea>
+        <br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <h1>Search Comments</h1>
+    <form id="search-form">
+        <label for="query">Query:</label>
+        <input type="text" id="query" name="query" required>
+        <button type="submit">Search</button>
+    </form>
+
+    <h1>Results</h1>
+    <ul id="results"></ul>
+
+    <script>
+        $("#comment-form").on("submit", function(event) {
+            event.preventDefault();
+
+            const formData = {
+                name: $("#name").val(),
+                content: $("#content").val()
+            };
+
+            $.post("/comment", formData, function(data) {
+                alert(data.result);
+                $("#name").val('');
+                $("#content").val('');
+            });
+        });
+
+        $("#search-form").on("submit", function(event) {
+            event.preventDefault();
+
+            const query = $("#query").val();
+
+            $.getJSON(`/search?query=${query}`, function(data) {
+                $("#results").empty();
+                data.comments.forEach(function(comment) {
+                    $("#results").append(`<li>${comment.name}: ${comment.content} (${comment.created_at})</li>`);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
